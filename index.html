@@ -11,7 +11,7 @@
     --paper: #fff;
     --accent: #d08c2e;
     --gutter: 34px;
-    --card-h: clamp(300px, 49vh, 560px);
+    --card-h: clamp(320px, 52vh, 600px);
     --card-w: calc(var(--card-h) * 0.667);
     --font-sans: "Neue Haas Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
@@ -330,7 +330,7 @@
     { name: "Destinations",  desc: "Destinations in the making" },
   ];
 
-  const COL_SHIFTS = [0, 70, -45, 90, 25, -30, 75, -15];
+  const COL_SHIFTS = [0, 90, -60, 110, 35, -40, 80, -25];
 
   /* ---------- Render ---------- */
   const track = document.getElementById("track");
@@ -359,7 +359,7 @@
     track.innerHTML = "";
     let col = null, colIndex = 0;
     list.forEach((c, i) => {
-      if (!col || col.dataset.count >= 2 || (c.short && col.dataset.count >= 1)) {
+      if (!col || col.dataset.count >= 2) {
         col = document.createElement("div");
         col.className = "col";
         col.dataset.count = 0;
