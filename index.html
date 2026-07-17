@@ -10,8 +10,8 @@
     --ink: #000;
     --paper: #fff;
     --accent: #d08c2e;
-    --gutter: 35px;
-    --card-h: clamp(260px, 40vh, 442px);
+    --gutter: 34px;
+    --card-h: clamp(300px, 49vh, 560px);
     --card-w: calc(var(--card-h) * 0.667);
     --font-sans: "Neue Haas Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
   }
@@ -20,7 +20,6 @@
 
   html, body {
     height: 100%;
-    overflow: hidden;
     background: var(--paper);
     color: var(--ink);
     font-family: var(--font-sans);
@@ -28,6 +27,7 @@
     line-height: 1.35;
     -webkit-font-smoothing: antialiased;
   }
+  body { overflow: hidden; }
 
   ::selection { background: var(--ink); color: var(--paper); }
 
@@ -37,38 +37,36 @@
   /* ---------- Chrome (fixed UI) ---------- */
   .logo {
     position: fixed;
-    top: var(--gutter);
-    left: var(--gutter);
+    top: 28px;
+    left: 32px;
     z-index: 40;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 500;
-    letter-spacing: 0.01em;
+    letter-spacing: 0.005em;
     mix-blend-mode: difference;
     color: #fff;
   }
 
   .menu-btn {
     position: fixed;
-    right: var(--gutter);
-    bottom: var(--gutter);
+    right: 32px;
+    bottom: 26px;
     z-index: 40;
-    text-transform: uppercase;
-    font-size: 14px;
-    letter-spacing: 0.04em;
+    font-size: 16px;
     mix-blend-mode: difference;
     color: #fff;
   }
 
   .filter-btn {
     position: fixed;
-    right: 14px;
+    left: 50%;
     top: 50%;
     z-index: 40;
-    transform: translateY(-50%);
+    transform: translate(-50%, -50%);
     writing-mode: vertical-rl;
     text-transform: uppercase;
     font-size: 13px;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.12em;
     mix-blend-mode: difference;
     color: #fff;
   }
@@ -76,26 +74,9 @@
     content: "";
     display: block;
     width: 1px;
-    height: 34px;
-    margin: 0 auto 12px;
+    height: 30px;
+    margin: 0 auto 10px;
     background: currentColor;
-  }
-
-  .scroll-progress {
-    position: fixed;
-    left: var(--gutter);
-    bottom: var(--gutter);
-    z-index: 40;
-    width: 120px;
-    height: 1px;
-    background: rgba(0,0,0,.15);
-  }
-  .scroll-progress i {
-    display: block;
-    height: 100%;
-    width: 0%;
-    background: var(--ink);
-    transition: width .1s linear;
   }
 
   /* ---------- Horizontal gallery ---------- */
@@ -130,15 +111,14 @@
     width: var(--card-w);
     display: block;
   }
-  .card.is-hidden { display: none; }
-
   .card .frame {
     position: relative;
     width: 100%;
     height: var(--card-h);
     overflow: hidden;
   }
-  .card.short .frame { height: calc(var(--card-h) * 0.72); }
+  /* secondary aspect ratio seen in the grid: 3:4 instead of 2:3 */
+  .card.short .frame { height: calc(var(--card-w) / 0.751); }
 
   .card .visual {
     position: absolute;
@@ -149,74 +129,61 @@
     transform: scale(1.001);
     transition: transform .7s cubic-bezier(.16,1,.3,1);
   }
-  .card:hover .visual { transform: scale(1.06); }
+  .card:hover .visual { transform: scale(1.05); }
 
   .visual .idx {
-    font-size: 13px;
-    letter-spacing: .12em;
-    color: rgba(255,255,255,.85);
+    font-size: 12px;
+    letter-spacing: .14em;
+    color: rgba(255,255,255,.55);
     text-transform: uppercase;
   }
+  .card.light .visual .idx { color: rgba(0,0,0,.35); }
 
   .card .tag {
     position: absolute;
     top: 12px;
     right: 12px;
     z-index: 2;
-    padding: 5px 12px 6px;
-    border-radius: 999px;
-    font-size: 13px;
+    padding: 5px 16px;
+    border-radius: 38px;
+    font-size: 14px;
     color: #fff;
-    background: rgba(255,255,255,.16);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(0,0,0,.2);
+    backdrop-filter: blur(3.2px);
+    -webkit-backdrop-filter: blur(3.2px);
     white-space: nowrap;
   }
-  .card .tag.light { background: rgba(0,0,0,.35); }
 
   .card .caption {
-    margin-top: 10px;
-    font-size: 15px;
-    max-width: 92%;
-  }
-  .caption .name { text-transform: uppercase; }
-  .caption .sep { opacity: .5; padding: 0 2px; }
-  .caption .desc { color: rgba(0,0,0,.75); }
-
-  /* captions overlaid on tall editorial cards */
-  .card.overlay .caption {
     position: absolute;
-    left: 12px;
-    bottom: 12px;
-    margin: 0;
+    left: 16px;
+    bottom: 14px;
+    right: 16px;
     z-index: 2;
+    font-size: 14px;
+    line-height: 1.2;
     color: #fff;
   }
-  .card.overlay .caption .desc { color: rgba(255,255,255,.85); }
+  .card.light .caption { color: var(--ink); }
+  .caption .name { text-transform: uppercase; }
+  .caption .sep { opacity: .55; padding: 0 1px; }
 
   /* ---------- Custom cursor ---------- */
   .cursor {
     position: fixed;
     z-index: 60;
     top: 0; left: 0;
-    width: 56px; height: 56px;
-    margin: -28px 0 0 -28px;
+    width: 44px; height: 44px;
+    margin: -22px 0 0 -22px;
     border-radius: 50%;
     background: var(--accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: #fff;
     pointer-events: none;
     opacity: 0;
     transform: scale(1);
     transition: transform .3s cubic-bezier(.16,1,.3,1), opacity .3s;
   }
-  .cursor.is-down { transform: scale(.8); }
-  .cursor.is-hover { transform: scale(1.35); }
+  .cursor.is-down { transform: scale(.75); }
+  .cursor.is-hover { transform: scale(1.3); }
   @media (hover: none) { .cursor { display: none; } .viewport { cursor: auto; } }
 
   /* ---------- Filter overlay ---------- */
@@ -228,7 +195,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     background: rgba(255,255,255,.92);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
@@ -248,11 +215,9 @@
 
   .filters .close {
     position: absolute;
-    top: var(--gutter);
-    right: var(--gutter);
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: .08em;
+    top: 28px;
+    right: 32px;
+    font-size: 15px;
     color: var(--ink);
   }
 
@@ -260,11 +225,40 @@
     position: fixed;
     left: 50%;
     bottom: 10px;
-    z-index: 40;
     transform: translateX(-50%);
-    font-size: 11px;
-    color: rgba(0,0,0,.4);
+    z-index: 40;
+    font-size: 10px;
+    color: #fff;
+    opacity: .6;
+    mix-blend-mode: difference;
     letter-spacing: .02em;
+    white-space: nowrap;
+  }
+
+  /* ---------- Vertical feed on narrow / portrait screens ---------- */
+  @media (max-width: 820px) {
+    body { overflow: auto; }
+    .viewport { position: static; overflow: visible; cursor: auto; }
+    .track {
+      position: static;
+      transform: none !important;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--gutter);
+      padding: 90px 0 120px;
+    }
+    .col {
+      flex: none;
+      transform: none;
+      align-items: center;
+    }
+    .card { width: min(86vw, 453px); }
+    .card .frame { height: calc(min(86vw, 453px) / 0.751); }
+    .card.short .frame { height: calc(min(86vw, 453px) / 0.751); }
+    .card .caption { text-align: center; }
+    .filter-btn { display: none; }
+    .cursor { display: none; }
+    .credit { left: 50%; transform: translateX(-50%); white-space: nowrap; }
   }
 </style>
 </head>
@@ -279,13 +273,11 @@
   <button class="filter-btn" id="filterBtn">Filter work</button>
   <button class="menu-btn">Menu</button>
 
-  <div class="scroll-progress"><i id="progress"></i></div>
-
   <div class="filters" id="filters">
     <button class="close" data-close>Close</button>
   </div>
 
-  <div class="cursor" id="cursor">Drag</div>
+  <div class="cursor" id="cursor"></div>
 
   <p class="credit">Design study — placeholder content, not affiliated with any agency</p>
 
@@ -297,40 +289,43 @@
     ["#284b63", "#6aa5c4"], ["#6b3a1f", "#c48a5e"], ["#3f4a2b", "#95a56a"],
     ["#55282b", "#b46a6f"], ["#1f2d3a", "#5e7d95"], ["#7a5e2f", "#cfae6a"],
   ];
+  const LIGHT_PALETTES = [
+    ["#efece6", "#d8d2c4"], ["#e9e4dd", "#cfc8bb"], ["#f0eee9", "#dcd6cf"],
+  ];
 
   const CASES = [
     { name: "Aurora",        desc: "Creative partnership since 2018" },
     { name: "Fern & Co",     desc: "Rebranding and a scalable e-commerce solution", tag: "Newly Added" },
     { name: "Meridian",      desc: "Meticulous redesign for a minimalist fashion house", tag: "Shopify" },
     { name: "Kinetic Lab",   desc: "Science-based sportswear platform" },
-    { name: "Summit Co",     desc: "Moved by mountains", overlay: true },
-    { name: "Lumen Museum",  desc: "Cultural platform all about photography", short: true },
+    { name: "Summit Co",     desc: "Moved by mountains" },
+    { name: "Lumen Museum",  desc: "Cultural platform all about photography", short: true, light: true },
     { name: "Expedition 9",  desc: "A shoppable expedition" },
-    { name: "Groundwork",    desc: "Giving meaning to space", overlay: true },
+    { name: "Groundwork",    desc: "Giving meaning to space" },
     { name: "Paygrid",       desc: "Grow your way", short: true },
     { name: "Instantly",     desc: "Rebuilding a digital flagship with headless commerce", tag: "Headless Shopify" },
     { name: "Trailsystem",   desc: "Launching a trail running footwear system", tag: "Headless Shopify" },
-    { name: "Triline",       desc: "Design system to unify all digital touchpoints" },
+    { name: "Triline",       desc: "Design system to unify all digital touchpoints", light: true },
     { name: "Club Spirit",   desc: "An expressive platform with an unbeatable spirit", tag: "Shopify" },
-    { name: "Curveform",     desc: "A futurist identity for a pioneering type foundry", overlay: true },
+    { name: "Curveform",     desc: "A futurist identity for a pioneering type foundry" },
     { name: "Rotate Studio", desc: "Kinetic branding & platform", short: true },
     { name: "Open Walls",    desc: "An exhibition without walls" },
     { name: "Essence",       desc: "Sparking all senses but smell" },
-    { name: "Giftfinder",    desc: "Designing an immersive product finder", tag: "Most Awarded", short: true },
-    { name: "Maison V",      desc: "Parisian luxury meets digital elegance", overlay: true },
+    { name: "Giftfinder",    desc: "Designing an immersive product finder", tag: "Most Awarded", short: true, light: true },
+    { name: "Maison V",      desc: "Parisian luxury meets digital elegance" },
     { name: "Framecam",      desc: "Shoppable campaign site for a premium camera", tag: "Shopify" },
     { name: "The Cask",      desc: "A digital journey" },
     { name: "Land of Ride",  desc: "Unfold the world of adventures", tag: "Shopify" },
     { name: "Pocketful",     desc: "A better world starts in your pocket", short: true },
     { name: "Talent 21",     desc: "A digital exhibition celebrating emotional browsing", tag: "Most Awarded" },
-    { name: "Sensorial",     desc: "Multi-sensory flagship store", overlay: true },
+    { name: "Sensorial",     desc: "Multi-sensory flagship store" },
     { name: "Alpenglow",     desc: "Renewed identity, packaging and digital flagship", tag: "Shopify" },
-    { name: "Three Brands",  desc: "Three brands, one shopping experience", short: true },
+    { name: "Three Brands",  desc: "Three brands, one shopping experience", short: true, light: true },
     { name: "Streetlux",     desc: "Digital flagship store for a luxury streetwear brand", tag: "Shopify" },
     { name: "Framewear",     desc: "The omnichannel future of eyewear" },
     { name: "Lifeform",      desc: "A digital platform inspired by life", tag: "Newly Added" },
     { name: "Art Piece",     desc: "A digital art piece for an artist", short: true },
-    { name: "Destinations",  desc: "Developing destinations", overlay: true },
+    { name: "Destinations",  desc: "Developing destinations" },
   ];
 
   const COL_SHIFTS = [0, 70, -45, 90, 25, -30, 75, -15];
@@ -338,13 +333,16 @@
   /* ---------- Render ---------- */
   const track = document.getElementById("track");
   let target = 0, current = 0;
+  let lightCount = 0;
 
   function cardEl(c, i) {
     const a = document.createElement("a");
     a.href = "#";
-    a.className = "card" + (c.short ? " short" : "") + (c.overlay ? " overlay" : "");
+    a.className = "card" + (c.short ? " short" : "") + (c.light ? " light" : "");
     a.dataset.tag = c.tag || "";
-    const [c1, c2] = PALETTES[i % PALETTES.length];
+    const [c1, c2] = c.light
+      ? LIGHT_PALETTES[c._light % LIGHT_PALETTES.length]
+      : PALETTES[i % PALETTES.length];
     const angle = (i * 47) % 360;
     a.innerHTML = `
       <div class="frame">
@@ -352,8 +350,8 @@
           <span class="idx">Case ${String(i + 1).padStart(2, "0")}</span>
         </div>
         ${c.tag ? `<span class="tag">${c.tag}</span>` : ""}
-      </div>
-      <p class="caption"><span class="name">${c.name}</span><span class="sep"> · </span><span class="desc">${c.desc}</span></p>`;
+        <p class="caption"><span class="name">${c.name}</span><span class="sep"> · </span>${c.desc}</p>
+      </div>`;
     return a;
   }
 
@@ -375,22 +373,24 @@
     target = 0; current = 0;
   }
 
-  CASES.forEach((c, i) => (c._i = i));
+  CASES.forEach((c, i) => { c._i = i; if (c.light) c._light = lightCount++; });
   layout(CASES);
 
   /* ---------- Smooth horizontal scroll (wheel + drag) ---------- */
   const viewport = document.getElementById("viewport");
-  const progress = document.getElementById("progress");
+  const isDesktop = () => matchMedia("(min-width: 821px)").matches;
   let dragging = false, dragStartX = 0, dragStartTarget = 0;
 
   const maxScroll = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
 
   viewport.addEventListener("wheel", (e) => {
+    if (!isDesktop()) return;
     e.preventDefault();
     target += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * 1.1;
   }, { passive: false });
 
   viewport.addEventListener("pointerdown", (e) => {
+    if (!isDesktop()) return;
     dragging = true; dragStartX = e.clientX; dragStartTarget = target;
     cursor.classList.add("is-down");
   });
@@ -402,10 +402,11 @@
   });
 
   function tick() {
-    target = Math.max(0, Math.min(maxScroll(), target));
-    current += (target - current) * 0.08;
-    track.style.transform = `translate3d(${-current}px, -50%, 0)`;
-    progress.style.width = maxScroll() ? (current / maxScroll()) * 100 + "%" : "0%";
+    if (isDesktop()) {
+      target = Math.max(0, Math.min(maxScroll(), target));
+      current += (target - current) * 0.08;
+      track.style.transform = `translate3d(${-current}px, -50%, 0)`;
+    }
     requestAnimationFrame(tick);
   }
   tick();
@@ -413,12 +414,10 @@
   /* ---------- Custom cursor ---------- */
   const cursor = document.getElementById("cursor");
   window.addEventListener("pointermove", (e) => {
-    cursor.style.transform = "";
     cursor.style.top = e.clientY + "px";
     cursor.style.left = e.clientX + "px";
     const overCard = e.target.closest && e.target.closest(".card");
     cursor.classList.toggle("is-hover", !!overCard);
-    cursor.textContent = overCard ? "View" : "Drag";
     cursor.style.opacity = e.target.closest && e.target.closest(".viewport, .card") ? 1 : 0;
   });
 
