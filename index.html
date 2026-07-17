@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Work — Studio Clone</title>
+<meta name="description" content="Design-study recreation of a horizontally scrolling agency case grid. Placeholder content only.">
+<style>
+  :root {
+    --ink: #000;
+    --paper: #fff;
+    --accent: #d08c2e;
+    --gutter: 35px;
+    --card-h: clamp(260px, 40vh, 442px);
+    --card-w: calc(var(--card-h) * 0.667);
+    --font-sans: "Neue Haas Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.35;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--ink); color: var(--paper); }
+
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+  /* ---------- Chrome (fixed UI) ---------- */
+  .logo {
+    position: fixed;
+    top: var(--gutter);
+    left: var(--gutter);
+    z-index: 40;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    mix-blend-mode: difference;
+    color: #fff;
+  }
+
+  .menu-btn {
+    position: fixed;
+    right: var(--gutter);
+    bottom: var(--gutter);
+    z-index: 40;
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    mix-blend-mode: difference;
+    color: #fff;
+  }
+
+  .filter-btn {
+    position: fixed;
+    right: 14px;
+    top: 50%;
+    z-index: 40;
+    transform: translateY(-50%);
+    writing-mode: vertical-rl;
+    text-transform: uppercase;
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    mix-blend-mode: difference;
+    color: #fff;
+  }
+  .filter-btn::before {
+    content: "";
+    display: block;
+    width: 1px;
+    height: 34px;
+    margin: 0 auto 12px;
+    background: currentColor;
+  }
+
+  .scroll-progress {
+    position: fixed;
+    left: var(--gutter);
+    bottom: var(--gutter);
+    z-index: 40;
+    width: 120px;
+    height: 1px;
+    background: rgba(0,0,0,.15);
+  }
+  .scroll-progress i {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--ink);
+    transition: width .1s linear;
+  }
+
+  /* ---------- Horizontal gallery ---------- */
+  .viewport {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    cursor: none;
+  }
+
+  .track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    display: flex;
+    gap: var(--gutter);
+    padding: 0 var(--gutter);
+    transform: translateY(-50%);
+    will-change: transform;
+  }
+
+  .col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gutter);
+    flex: 0 0 var(--card-w);
+    transform: translateY(var(--col-shift, 0px));
+  }
+
+  .card {
+    position: relative;
+    width: var(--card-w);
+    display: block;
+  }
+  .card.is-hidden { display: none; }
+
+  .card .frame {
+    position: relative;
+    width: 100%;
+    height: var(--card-h);
+    overflow: hidden;
+  }
+  .card.short .frame { height: calc(var(--card-h) * 0.72); }
+
+  .card .visual {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(1.001);
+    transition: transform .7s cubic-bezier(.16,1,.3,1);
+  }
+  .card:hover .visual { transform: scale(1.06); }
+
+  .visual .idx {
+    font-size: 13px;
+    letter-spacing: .12em;
+    color: rgba(255,255,255,.85);
+    text-transform: uppercase;
+  }
+
+  .card .tag {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    padding: 5px 12px 6px;
+    border-radius: 999px;
+    font-size: 13px;
+    color: #fff;
+    background: rgba(255,255,255,.16);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    white-space: nowrap;
+  }
+  .card .tag.light { background: rgba(0,0,0,.35); }
+
+  .card .caption {
+    margin-top: 10px;
+    font-size: 15px;
+    max-width: 92%;
+  }
+  .caption .name { text-transform: uppercase; }
+  .caption .sep { opacity: .5; padding: 0 2px; }
+  .caption .desc { color: rgba(0,0,0,.75); }
+
+  /* captions overlaid on tall editorial cards */
+  .card.overlay .caption {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    margin: 0;
+    z-index: 2;
+    color: #fff;
+  }
+  .card.overlay .caption .desc { color: rgba(255,255,255,.85); }
+
+  /* ---------- Custom cursor ---------- */
+  .cursor {
+    position: fixed;
+    z-index: 60;
+    top: 0; left: 0;
+    width: 56px; height: 56px;
+    margin: -28px 0 0 -28px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #fff;
+    pointer-events: none;
+    opacity: 0;
+    transform: scale(1);
+    transition: transform .3s cubic-bezier(.16,1,.3,1), opacity .3s;
+  }
+  .cursor.is-down { transform: scale(.8); }
+  .cursor.is-hover { transform: scale(1.35); }
+  @media (hover: none) { .cursor { display: none; } .viewport { cursor: auto; } }
+
+  /* ---------- Filter overlay ---------- */
+  .filters {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .4s, visibility .4s;
+  }
+  .filters.is-open { opacity: 1; visibility: visible; }
+
+  .filters button {
+    font-size: clamp(28px, 5vw, 56px);
+    line-height: 1.15;
+    color: rgba(0,0,0,.3);
+    transition: color .25s;
+  }
+  .filters button:hover, .filters button.is-active { color: var(--ink); }
+
+  .filters .close {
+    position: absolute;
+    top: var(--gutter);
+    right: var(--gutter);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--ink);
+  }
+
+  .credit {
+    position: fixed;
+    left: 50%;
+    bottom: 10px;
+    z-index: 40;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: rgba(0,0,0,.4);
+    letter-spacing: .02em;
+  }
+</style>
+</head>
+<body>
+
+  <a class="logo" href="#" aria-label="Home">Studio.</a>
+
+  <div class="viewport" id="viewport">
+    <div class="track" id="track"></div>
+  </div>
+
+  <button class="filter-btn" id="filterBtn">Filter work</button>
+  <button class="menu-btn">Menu</button>
+
+  <div class="scroll-progress"><i id="progress"></i></div>
+
+  <div class="filters" id="filters">
+    <button class="close" data-close>Close</button>
+  </div>
+
+  <div class="cursor" id="cursor">Drag</div>
+
+  <p class="credit">Design study — placeholder content, not affiliated with any agency</p>
+
+<script>
+  /* ---------- Placeholder data (original, non-affiliated) ---------- */
+  const PALETTES = [
+    ["#7a2f2b", "#c96f4a"], ["#1f3a2e", "#5e8c6a"], ["#2b3a55", "#7d95c4"],
+    ["#8c6a3f", "#d9b98a"], ["#4a2b45", "#9a6a8f"], ["#333333", "#8a8a8a"],
+    ["#284b63", "#6aa5c4"], ["#6b3a1f", "#c48a5e"], ["#3f4a2b", "#95a56a"],
+    ["#55282b", "#b46a6f"], ["#1f2d3a", "#5e7d95"], ["#7a5e2f", "#cfae6a"],
+  ];
+
+  const CASES = [
+    { name: "Aurora",        desc: "Creative partnership since 2018" },
+    { name: "Fern & Co",     desc: "Rebranding and a scalable e-commerce solution", tag: "Newly Added" },
+    { name: "Meridian",      desc: "Meticulous redesign for a minimalist fashion house", tag: "Shopify" },
+    { name: "Kinetic Lab",   desc: "Science-based sportswear platform" },
+    { name: "Summit Co",     desc: "Moved by mountains", overlay: true },
+    { name: "Lumen Museum",  desc: "Cultural platform all about photography", short: true },
+    { name: "Expedition 9",  desc: "A shoppable expedition" },
+    { name: "Groundwork",    desc: "Giving meaning to space", overlay: true },
+    { name: "Paygrid",       desc: "Grow your way", short: true },
+    { name: "Instantly",     desc: "Rebuilding a digital flagship with headless commerce", tag: "Headless Shopify" },
+    { name: "Trailsystem",   desc: "Launching a trail running footwear system", tag: "Headless Shopify" },
+    { name: "Triline",       desc: "Design system to unify all digital touchpoints" },
+    { name: "Club Spirit",   desc: "An expressive platform with an unbeatable spirit", tag: "Shopify" },
+    { name: "Curveform",     desc: "A futurist identity for a pioneering type foundry", overlay: true },
+    { name: "Rotate Studio", desc: "Kinetic branding & platform", short: true },
+    { name: "Open Walls",    desc: "An exhibition without walls" },
+    { name: "Essence",       desc: "Sparking all senses but smell" },
+    { name: "Giftfinder",    desc: "Designing an immersive product finder", tag: "Most Awarded", short: true },
+    { name: "Maison V",      desc: "Parisian luxury meets digital elegance", overlay: true },
+    { name: "Framecam",      desc: "Shoppable campaign site for a premium camera", tag: "Shopify" },
+    { name: "The Cask",      desc: "A digital journey" },
+    { name: "Land of Ride",  desc: "Unfold the world of adventures", tag: "Shopify" },
+    { name: "Pocketful",     desc: "A better world starts in your pocket", short: true },
+    { name: "Talent 21",     desc: "A digital exhibition celebrating emotional browsing", tag: "Most Awarded" },
+    { name: "Sensorial",     desc: "Multi-sensory flagship store", overlay: true },
+    { name: "Alpenglow",     desc: "Renewed identity, packaging and digital flagship", tag: "Shopify" },
+    { name: "Three Brands",  desc: "Three brands, one shopping experience", short: true },
+    { name: "Streetlux",     desc: "Digital flagship store for a luxury streetwear brand", tag: "Shopify" },
+    { name: "Framewear",     desc: "The omnichannel future of eyewear" },
+    { name: "Lifeform",      desc: "A digital platform inspired by life", tag: "Newly Added" },
+    { name: "Art Piece",     desc: "A digital art piece for an artist", short: true },
+    { name: "Destinations",  desc: "Developing destinations", overlay: true },
+  ];
+
+  const COL_SHIFTS = [0, 70, -45, 90, 25, -30, 75, -15];
+
+  /* ---------- Render ---------- */
+  const track = document.getElementById("track");
+  let target = 0, current = 0;
+
+  function cardEl(c, i) {
+    const a = document.createElement("a");
+    a.href = "#";
+    a.className = "card" + (c.short ? " short" : "") + (c.overlay ? " overlay" : "");
+    a.dataset.tag = c.tag || "";
+    const [c1, c2] = PALETTES[i % PALETTES.length];
+    const angle = (i * 47) % 360;
+    a.innerHTML = `
+      <div class="frame">
+        <div class="visual" style="background:linear-gradient(${angle}deg, ${c1}, ${c2})">
+          <span class="idx">Case ${String(i + 1).padStart(2, "0")}</span>
+        </div>
+        ${c.tag ? `<span class="tag">${c.tag}</span>` : ""}
+      </div>
+      <p class="caption"><span class="name">${c.name}</span><span class="sep"> · </span><span class="desc">${c.desc}</span></p>`;
+    return a;
+  }
+
+  function layout(list) {
+    track.innerHTML = "";
+    let col = null, colIndex = 0;
+    list.forEach((c, i) => {
+      if (!col || col.dataset.count >= 2 || (c.short && col.dataset.count >= 1)) {
+        col = document.createElement("div");
+        col.className = "col";
+        col.dataset.count = 0;
+        col.style.setProperty("--col-shift", COL_SHIFTS[colIndex % COL_SHIFTS.length] + "px");
+        track.appendChild(col);
+        colIndex++;
+      }
+      col.appendChild(cardEl(c, c._i ?? i));
+      col.dataset.count = +col.dataset.count + 1;
+    });
+    target = 0; current = 0;
+  }
+
+  CASES.forEach((c, i) => (c._i = i));
+  layout(CASES);
+
+  /* ---------- Smooth horizontal scroll (wheel + drag) ---------- */
+  const viewport = document.getElementById("viewport");
+  const progress = document.getElementById("progress");
+  let dragging = false, dragStartX = 0, dragStartTarget = 0;
+
+  const maxScroll = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
+
+  viewport.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    target += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * 1.1;
+  }, { passive: false });
+
+  viewport.addEventListener("pointerdown", (e) => {
+    dragging = true; dragStartX = e.clientX; dragStartTarget = target;
+    cursor.classList.add("is-down");
+  });
+  window.addEventListener("pointermove", (e) => {
+    if (dragging) target = dragStartTarget - (e.clientX - dragStartX) * 1.6;
+  });
+  window.addEventListener("pointerup", () => {
+    dragging = false; cursor.classList.remove("is-down");
+  });
+
+  function tick() {
+    target = Math.max(0, Math.min(maxScroll(), target));
+    current += (target - current) * 0.08;
+    track.style.transform = `translate3d(${-current}px, -50%, 0)`;
+    progress.style.width = maxScroll() ? (current / maxScroll()) * 100 + "%" : "0%";
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  /* ---------- Custom cursor ---------- */
+  const cursor = document.getElementById("cursor");
+  window.addEventListener("pointermove", (e) => {
+    cursor.style.transform = "";
+    cursor.style.top = e.clientY + "px";
+    cursor.style.left = e.clientX + "px";
+    const overCard = e.target.closest && e.target.closest(".card");
+    cursor.classList.toggle("is-hover", !!overCard);
+    cursor.textContent = overCard ? "View" : "Drag";
+    cursor.style.opacity = e.target.closest && e.target.closest(".viewport, .card") ? 1 : 0;
+  });
+
+  /* ---------- Filters ---------- */
+  const filters = document.getElementById("filters");
+  const TAGS = ["All", ...new Set(CASES.map((c) => c.tag).filter(Boolean))];
+  TAGS.forEach((t) => {
+    const b = document.createElement("button");
+    b.textContent = t;
+    if (t === "All") b.classList.add("is-active");
+    b.addEventListener("click", () => {
+      filters.querySelectorAll("button").forEach((x) => x.classList.remove("is-active"));
+      b.classList.add("is-active");
+      layout(t === "All" ? CASES : CASES.filter((c) => c.tag === t));
+      filters.classList.remove("is-open");
+    });
+    filters.insertBefore(b, filters.querySelector(".close"));
+  });
+  document.getElementById("filterBtn").addEventListener("click", () => filters.classList.add("is-open"));
+  filters.querySelector("[data-close]").addEventListener("click", () => filters.classList.remove("is-open"));
+  window.addEventListener("keydown", (e) => { if (e.key === "Escape") filters.classList.remove("is-open"); });
+</script>
+</body>
+</html>
